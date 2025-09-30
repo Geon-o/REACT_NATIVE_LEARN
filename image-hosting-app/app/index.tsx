@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
-import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import PhotoGrid from '@/components/home/PhotoGrid';
 import FloatingButton from '@/components/ui/FloatingButton';
 
@@ -14,38 +13,33 @@ interface Photo {
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const [photos, setPhotos] = useState<Photo[]>([]);
+  const [isButtonVisible, setIsButtonVisible] = useState(true);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const buttonOpacity = useSharedValue(1);
-
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      opacity: buttonOpacity.value,
-      pointerEvents: buttonOpacity.value === 1 ? 'auto' : 'none',
-    };
-  });
-
-  const hideButton = () => {
-    if (photos.length > 0) {
-      buttonOpacity.value = withTiming(0, { duration: 500 });
-    }
-  };
 
   const handleInteraction = () => {
     if (timerRef.current) {
       clearTimeout(timerRef.current);
     }
-    buttonOpacity.value = withTiming(1, { duration: 200 });
-    timerRef.current = setTimeout(hideButton, 3500);
+
+    const hideButton = () => {
+      if (photos.length > 0) {
+        setIsButtonVisible(false);
+      }
+    };
+
+    setIsButtonVisible(true);
+    timerRef.current = setTimeout(hideButton, 2000);
   };
 
   useEffect(() => {
-    handleInteraction(); // Start the timer on mount
+    handleInteraction();
+
     return () => {
       if (timerRef.current) {
         clearTimeout(timerRef.current);
       }
     };
-  }, [photos.length]); // Rerun logic when photos are added/removed
+  }, [photos.length]);
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -67,16 +61,14 @@ export default function HomeScreen() {
   return (
     <View
       style={styles.container}
-      onStartShouldSetResponder={() => {
+      onStartShouldSetResponderCapture={() => {
         handleInteraction();
-        return false; // We don't want this view to become the responder
+        return false; // Allow children to also handle the touch
       }}>
       <View style={{ ...styles.gridContainer, paddingTop: insets.top + 20 }}>
         <PhotoGrid photos={photos} />
       </View>
-      <Animated.View style={animatedStyle}>
-        <FloatingButton onPress={pickImage} />
-      </Animated.View>
+      <FloatingButton onPress={pickImage} isVisible={isButtonVisible} />
     </View>
   );
 }

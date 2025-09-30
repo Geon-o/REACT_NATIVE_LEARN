@@ -1,17 +1,34 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { TouchableOpacity, Text, StyleSheet, View } from 'react-native';
+import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 
 interface FloatingButtonProps {
   onPress: () => void;
+  isVisible: boolean;
 }
 
-export default function FloatingButton({ onPress }: FloatingButtonProps) {
+export default function FloatingButton({ onPress, isVisible }: FloatingButtonProps) {
+  const opacity = useSharedValue(0);
+
+  useEffect(() => {
+    opacity.value = withTiming(isVisible ? 1 : 0, { duration: 250 });
+  }, [isVisible]);
+
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: opacity.value,
+      pointerEvents: opacity.value === 1 ? 'auto' : 'none',
+    };
+  });
+
   return (
-    <TouchableOpacity style={styles.container} onPress={onPress}>
-      <View style={styles.button}>
-        <Text style={styles.icon}>+</Text>
-      </View>
-    </TouchableOpacity>
+    <Animated.View style={[styles.container, animatedStyle]}>
+      <TouchableOpacity onPress={onPress}>
+        <View style={styles.button}>
+          <Text style={styles.icon}>+</Text>
+        </View>
+      </TouchableOpacity>
+    </Animated.View>
   );
 }
 
@@ -28,14 +45,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#013220',
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
   },
   icon: {
     color: '#fff',
