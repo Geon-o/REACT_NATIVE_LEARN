@@ -99,7 +99,9 @@ export default function HomeScreen() {
         <StatusBar barStyle={theme === 'dark' ? 'light-content' : 'dark-content'} />
         <View style={{ ...styles.gridContainer, paddingTop: insets.top, backgroundColor: currentTheme.background }}>
           <View style={styles.header}>
-            <Text style={[styles.headerTitle, { color: currentTheme.textColor }]}>Photos</Text>
+            <TouchableOpacity>
+              <Ionicons name="folder-outline" size={28} color={currentTheme.iconColor} />
+            </TouchableOpacity>
             <TouchableOpacity
               style={styles.settingsButton}
               onPress={toggleDropdown}>
@@ -142,10 +144,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginBottom: 10,
     marginTop: 20,
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
   },
   settingsButton: {
     padding: 5,

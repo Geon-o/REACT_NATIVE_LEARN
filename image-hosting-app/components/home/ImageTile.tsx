@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Image, StyleSheet, Dimensions } from 'react-native';
+import { View, Image, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
 
 const numColumns = 3;
 const { width } = Dimensions.get('window');
@@ -7,13 +7,16 @@ const size = (width - 20) / numColumns; // 10 is for horizontal padding
 
 interface ImageTileProps {
   item: { id: string; source: any };
+  onPress: () => void;
 }
 
-export default function ImageTile({ item }: ImageTileProps) {
+export default function ImageTile({ item, onPress }: ImageTileProps) {
   return (
-    <View style={styles.imageContainer}>
-      <Image source={item.source} style={styles.image} />
-    </View>
+    <TouchableOpacity onPress={onPress}>
+      <View style={styles.imageContainer}>
+        <Image source={item.source} style={styles.image} />
+      </View>
+    </TouchableOpacity>
   );
 }
 
