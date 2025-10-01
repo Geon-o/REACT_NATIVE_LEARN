@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { TouchableOpacity, Text, StyleSheet, View } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import { useTheme } from '@/app/ThemeContext';
 
 interface FloatingButtonProps {
   onPress: () => void;
@@ -9,6 +10,7 @@ interface FloatingButtonProps {
 
 export default function FloatingButton({ onPress, isVisible }: FloatingButtonProps) {
   const opacity = useSharedValue(0);
+  const { theme } = useTheme();
 
   useEffect(() => {
     opacity.value = withTiming(isVisible ? 1 : 0, { duration: 250 });
@@ -24,7 +26,7 @@ export default function FloatingButton({ onPress, isVisible }: FloatingButtonPro
   return (
     <Animated.View style={[styles.container, animatedStyle]}>
       <TouchableOpacity onPress={onPress}>
-        <View style={styles.button}>
+        <View style={[styles.button, theme === 'dark' && styles.darkButton]}>
           <Text style={styles.icon}>+</Text>
         </View>
       </TouchableOpacity>
@@ -50,5 +52,9 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 30,
     fontWeight: 'bold',
+  },
+  darkButton: {
+    borderColor: '#fff',
+    borderWidth: 1,
   },
 });
